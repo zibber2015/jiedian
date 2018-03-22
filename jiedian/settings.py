@@ -26,7 +26,7 @@ MYSQL_PASSWD = '123456'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
-# 禁止重定向
+# 禁止重定向 11
 REDIRECT_ENABLED = False
 
 # 超时
