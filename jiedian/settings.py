@@ -15,8 +15,8 @@ SPIDER_MODULES = ['jiedian.spiders']
 NEWSPIDER_MODULE = 'jiedian.spiders'
 
 
-MYSQL_HOST = '127.0.0.1'
-MYSQL_DBNAME = 'd_jiedian'
+MYSQL_HOST = '119.3.28.131'
+MYSQL_DBNAME = 'd_dazhong'
 MYSQL_USER = 'root'
 MYSQL_PASSWD = '123456'
 
@@ -26,7 +26,7 @@ MYSQL_PASSWD = '123456'
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
-# 禁止重定向1
+# 禁止重定向
 REDIRECT_ENABLED = False
 
 # 超时
@@ -37,6 +37,8 @@ RANDOMIZE_DOWNLOAD_DELAY=False
 DOWNLOAD_DELAY=60/30.0
 #CONCURRENT_REQUESTS_PER_IP=40
 CONCURRENT_REQUESTS_PER_DOMAIN=1
+
+
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32

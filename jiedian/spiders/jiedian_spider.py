@@ -91,6 +91,7 @@ class JiedianSpider(Spider):
             item['vote_star'] = vote_star
             item['commit_num'] = commit_num_sub
             item['taste'] = taste_sub
+            item['consume'] = consume
             item['env'] = env_sub
             item['server'] = server_sub
             item['address'] = address
@@ -99,3 +100,6 @@ class JiedianSpider(Spider):
             item['long'] = long
             item['lat'] = lat
             item['created_at'] = int(time.time())
+
+            item['dbname'] = 'd_dazhong'
+            yield item
