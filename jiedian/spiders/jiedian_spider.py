@@ -1,4 +1,4 @@
-from scrapy.spider import Spider, Request
+from scrapy.spiders import Spider, Request
 from jiedian.items import JiedianItem
 from scrapy.exceptions import CloseSpider
 import time
