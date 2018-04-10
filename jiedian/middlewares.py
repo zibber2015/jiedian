@@ -6,6 +6,8 @@
 # http://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
+from fake_useragent import UserAgent
 
 
 class JiedianSpiderMiddleware(object):
@@ -54,3 +56,14 @@ class JiedianSpiderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+class MyAgent(UserAgentMiddleware):
+    def __init__(self, user_agent=''):
+        self.user_agent = user_agent
+
+    def process_request(self, request, spider):
+        ua = UserAgent().random
+        if ua:
+            print (ua, '----------------------user_agent chosed-------------------')
+            request.headers.setdefault('Host', 'www.dianping.com')
+            request.headers.setdefault('User-Agent', ua)

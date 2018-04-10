@@ -8,6 +8,7 @@ import time
 import pymysql.cursors
 from jiedian import settings
 
+
 class JiedianPipeline(object):
     def process_item(self, item, spider):
         connection = pymysql.connect(
@@ -21,13 +22,10 @@ class JiedianPipeline(object):
 
         try:
             with connection.cursor() as cursor:
-                now = int(time.time())
-                table = item['table']
+                sql = item['sql']
                 if item:
-                    sql = "insert into " + table +" (`title`, `page`, `img`, `text`, `content`, `create_time`) values (%s,%s,%s,%s,%s,%s)"
-                    cursor.execute(sql, (str(item['title']), item['page'], str(
-                        item['img']), str(item['text']), str(item['content']), now))
+                    cursor.execute(sql)
                     connection.commit()
-                    print(item['page'], '已经储存')
+                    print(sql , '已经储存')
         finally:
             connection.close()
