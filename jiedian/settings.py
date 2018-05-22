@@ -14,7 +14,7 @@ BOT_NAME = 'jiedian'
 SPIDER_MODULES = ['jiedian.spiders']
 NEWSPIDER_MODULE = 'jiedian.spiders'
 
-MYSQL_HOST = '119.3.28.131'
+MYSQL_HOST = 'localhost'
 MYSQL_DBNAME = 'd_dazhong'
 MYSQL_USER = 'root'
 MYSQL_PASSWD = '123456'
@@ -29,11 +29,11 @@ ROBOTSTXT_OBEY = True
 REDIRECT_ENABLED = False
 
 # 超时
-DOWNLOAD_TIMEOUT = 60
+DOWNLOAD_TIMEOUT = 20
 
 # 设置每分钟40个请求
 # RANDOMIZE_DOWNLOAD_DELAY = False
-DOWNLOAD_DELAY = 3
+# DOWNLOAD_DELAY = 3
 # CONCURRENT_REQUESTS_PER_IP=40
 # CONCURRENT_REQUESTS_PER_DOMAIN = 1
 
@@ -71,8 +71,8 @@ DOWNLOADER_MIDDLEWARES = {
    # 'jiedian.middlewares.MyCustomDownloaderMiddleware': 543,
    #  'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 #     'jiedian.middlewares.RotateUserAgentMiddleware': 400,
-    'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,#必需 ,禁用默认的middleware
-    'jiedian.middlewares.MyAgent': 400,
+#     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,#必需 ,禁用默认的middleware
+    # 'jiedian.middlewares.MyAgent': 400,
 }
 
 # Enable or disable extensions
@@ -106,7 +106,7 @@ ITEM_PIPELINES = {
 # HTTPCACHE_EXPIRATION_SECS = 0
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
-# LOG_FILE = 'zl.log'
+LOG_FILE = 'zl.log'
 
 # Retry many times since proxies often fail
 # RETRY_TIMES = 1# Retry on most error codes since proxies fail for different reasons
@@ -123,3 +123,4 @@ ITEM_PIPELINES = {
 # }
 # DUPEFILTER_CLASS = 'scrapy_splash.SplashAwareDupeFilter'
 # HTTPCACHE_STORAGE = 'scrapy_splash.SplashAwareFSCacheStorage'
+DUPEFILTER_DEBUG = True

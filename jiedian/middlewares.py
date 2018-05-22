@@ -62,8 +62,10 @@ class MyAgent(UserAgentMiddleware):
         self.user_agent = user_agent
 
     def process_request(self, request, spider):
-        ua = UserAgent().random
-        if ua:
-            print (ua, '----------------------user_agent chosed-------------------')
-            request.headers.setdefault('Host', 'www.dianping.com')
-            request.headers.setdefault('User-Agent', ua)
+        pass
+        # ua = UserAgent().random
+        # ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36'
+        # if ua:
+        #     print (ua, '----------------------user_agent chosed-------------------')
+        #     request.headers.setdefault('Host', 'www.dianping.com')
+        #     request.headers.setdefault('User-Agent', ua)

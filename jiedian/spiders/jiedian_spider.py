@@ -3,6 +3,7 @@ from jiedian.items import JiedianItem
 from scrapy.exceptions import CloseSpider
 import time
 from jiedian.helpers import helpers
+import json
 
 
 class JiedianSpider(Spider):
@@ -14,91 +15,91 @@ class JiedianSpider(Spider):
 
     def start_requests(self):
         # 城市
-        city_sql = "select * from `t_city`"
-        ret = helpers.mysql(self, city_sql)
-        if not ret :
-            url_city = 'http://www.dianping.com/citylist'
-            yield Request(url = url_city, callback=self.parse_jiedian_city)
+        poi_sql = "select page from `t_poi` order by page desc limit 1"
+        ret = helpers.mysql(self, poi_sql)
+
+        last_page = 1
+        if ret:
+            last_page = ret[0]['page']
+
+        # for i in range(1, 28570000):
+        for i in range(int(last_page) + 1, 28570000):
+            url_city = 'http://www.poi86.com/poi/{0}.html'.format(str(i))
+            yield Request(url = url_city, callback=self.parse_poi, meta={'page': i})
 
 
-
-    def parse_jiedian(self, response):
-        print(response.body)
+        #爬jiedian
         return
-        if response.status == 200:
-            # item['page'] = meta['current']
-            location = response.xpath('//*[@id="logo-input"]/div[1]/a[2]/span[2]/text()').extract_first()
-            if not location:
-                return
+        url = 'https://api.ankerjiedian.com/index.php'
+        body = {
+            "header": {
+                "type": "device",
+                "service": "sharedCharging",
+                "api": "YBusiness.getSimpleBusinessListByPosition",
+                "source": "",
+                "msg_id": "325263F4-4978-96AA-3CD7-5BC20B4B4C3F",
+                "client_v": "1.971",
+                "applet": "wxapp",
+                "access_token": "eyJleHAiOjE1MjY5Mjc1NTMsImtpZCI6MX0.eyJ1aWQiOiJmYmY5ZTE2Ni1hNjZhLTRkYjYtYTc3Yy0xZWVlZGY5MmM3ZDMiLCJ1c2VyX2lkIjoiMTg1NTc5ODMifQ.gAHadDUxEwxeNnmjX85FtuTm3p9URvHc3AZiL1JlD7A"
+            },
+            "body": {
+                "longitude": 113.94086359696294,
+                "latitude": 22.538313734395654
+            }
+        }
+        for i in range(1, 1000):
+            yield Request(url=url, method='POST', callback=self.parse_dianping, body=json.dumps(body), dont_filter=True)
 
-            first_menu = response.xpath('//*[@id="body"]/div/div[1]/a[1]/text()').extract_frist()
-            first_menu_sub = first_menu[(len(location) + 1):]
+    def parse_poi(self, response):
+        page = response.meta['page']
+        name = response.xpath('/html/body/div[2]/div[1]/div[1]/h1/text()').extract_first(default='')
+        province = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[1]/a/text()').extract_first(default='')
+        city = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[2]/a/text').extract_first(default='')
+        area = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[3]/a/text()').extract_first(default='')
+        address = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[4]/text()').extract_first(default='')
+        tel = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[5]/text()').extract_first(default='')
+        category = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[6]/a/text()').extract_first(default='')
+        tag_o = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[7]/a/text()').extract_first(default='')
+        tag = ''
+        if tag_o:
+            tag = tag_o.strip('(')
+        
+        # 大地坐标
+        earth = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[8]/text()').extract_first(default='')
+        earth_long = 0
+        earth_lat = 0
+        if earth:
+            earth_f = earth.strip(' ').split(',')
+            earth_long = earth_f[0]
+            earth_lat = earth_f[1]
 
-            # 分类
-            category = response.xpath('//*[@id="body"]/div/div[1]/a[2]/text()').extract()
-            #区
-            district = response.xpath('//*[@id="body"]/div/div[1]/a[3]/text()').extract()
-            #区域
-            area = response.xpath('//*[@id="body"]/div/div[1]/a[4]/text()').extract()
-            #商铺
-            shop_name = response.xpath('//*[@id="body"]/div/div[1]/span/text()').extract()
-            #评分
-            vote_star = response.xpath('//*[@id="basic-info"]/div[1]/span[1]/@title').extract_first()
-            vote_star_sub = vote_star[0]
+        #火星坐标
+        mars = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[9]/text()').extract_first(default='')
+        mars_long = 0
+        mars_lat = 0
+        if mars:
+            mars_f = mars.strip(' ').split(',')
+            mars_long = mars_f[0]
+            mars_lat = mars_f[1]     
+         
+        # 百度
+        baidu = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[10]/text()').extract_first(default='')
+        baidu_long = 0
+        baidu_lat = 0
+        if baidu:
+            baidu_f = baidu.strip(' ').split(',')
+            baidu_long = baidu_f[0]
+            baidu_lat = baidu_f[1]
 
-            #评论数
-            comment_num = response.xpath('//*[@id="reviewCount"]/text()').extract_first()
-            comment_num_sub = comment_num[:-3]
+        item = JiedianItem()
+        now = int(time.time())
+        sql = 'insert into t_poi (`province`, `city`, `area`, `address`, `tel`, `category`, `tag`, `earth_long`, `earth_lat`, `mars_long`, `mars_lat`, `baidu_long`, `baidu_lat`, `page`, `created_at`, `name`) ' \
+              'values (\"{0}\",\"{1}\", \"{2}\", \"{3}\", \"{4}\", \"{5}\", \"{6}\", \"{7}\", \"{8}\", \"{9}\", \"{10}\", \"{11}\", \"{12}\", \"{13}\", \"{14}\", \"{15}\")'.format(
+            province, city, area, address, tel, category, tag, earth_long, earth_lat, mars_long, mars_lat, baidu_long, baidu_lat, page, now, name
+        )
 
-            #人均
-            consume = response.xpath('//*[@id="avgPriceTitle"]/text()').extract_first()
-            comsume_sub = consume[3:-1]
-
-            # 口味
-            taste = response.xpath('//*[@id="comment_score"]/span[1]/text()').extract_first()
-            taste_sub = taste[3:]
-
-            #环境
-            env = response.xpath('//*[@id="comment_score"]/span[2]/text()').extract_first()
-            env_sub = env[3:]
-            #服务
-            server = response.xpath('//*[@id="comment_score"]/span[3]/text()').extract_first()
-            server_sub = server[3:]
-            #地址
-            address = response.xpath('//*[@id="basic-info"]/div[2]/span[2]/text()').extract()
-            #tel
-            tel = response.xpath('//*[@id="basic-info"]/p/span[2]/text()').extract()
-            #营业时间
-            business_time = response.xpath('//*[@id="basic-info"]/div[4]/p[1]/span[2]/text()').extract()
-
-            #local
-            # local = response.xpath('//*[@id="staticPage"]/script[1]/text()').extract_first()
-            # print(local)
-
-
-
-            #存表
-            item = JiedianItem()
-            item['location'] = location
-            item['menu'] = first_menu_sub
-            item['category'] = category
-            item['district'] = district
-            item['area'] = area
-            item['shop_name'] = shop_name
-            item['vote_star'] = vote_star_sub
-            item['comment_num'] = comment_num_sub
-            item['taste'] = taste_sub
-            item['consume'] = comsume_sub
-            item['env'] = env_sub
-            item['server'] = server_sub
-            item['address'] = address
-            item['tel'] = tel
-            item['business_time'] = business_time
-            # item['long'] = long
-            # item['lat'] = lat
-            item['table'] = 't_dazhong'
-            print(item)
-            return item
+        item['sql'] = sql
+        yield item
 
     def parse_jiedian_city(self, response):
         if response.status == 200:
@@ -110,7 +111,6 @@ class JiedianSpider(Spider):
             name_path = '//*[@id="main"]/div[4]/ul/li[*]/div[2]/div/a/text()'
             city_name = response.xpath(name_path).extract()
 
-
             url_path = '//*[@id="main"]/div[4]/ul/li[*]/div[2]/div/a/@href'
             url = response.xpath(url_path).extract()
 
@@ -120,10 +120,12 @@ class JiedianSpider(Spider):
             for i in url_f:
                 pos = i.find('/')
                 short.append(i[pos + 1:])
-
+            
+            
             item = JiedianItem()
             all_in = []
             for i in range(len(city_name)):
-                sql = 'insert into t_city (`url`, `name`, `short`, `created_at`) values ("%s","%s","%s",%d)' % (url_f[i], city_name[i], short[i], int(time.time()))
+                sql = 'insert into t_city (`url`, `name`, `short`, `created_at`) values ("%s","%s","%s",%d)' % (
+                    url_f[i], city_name[i], short[i], int(time.time()))
                 item['sql'] = sql
                 yield item
