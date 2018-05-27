@@ -10,7 +10,8 @@ class JiedianSpider(Spider):
     name = 'jiedian'
     allowed_domains = [
         'jiedian.com',
-        'dianping.com'
+        'dianping.com',
+        'poi86.com'
     ]
 
     def start_requests(self):
@@ -54,7 +55,7 @@ class JiedianSpider(Spider):
         page = response.meta['page']
         name = response.xpath('/html/body/div[2]/div[1]/div[1]/h1/text()').extract_first(default='')
         province = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[1]/a/text()').extract_first(default='')
-        city = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[2]/a/text').extract_first(default='')
+        city = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[2]/a/text()').extract_first(default='')
         area = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[3]/a/text()').extract_first(default='')
         address = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[4]/text()').extract_first(default='')
         tel = response.xpath('/html/body/div[2]/div[1]/div[2]/ul/li[5]/text()').extract_first(default='')

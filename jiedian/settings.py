@@ -23,22 +23,22 @@ MYSQL_PASSWD = '123456'
 # USER_AGENT = 'jiedian (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # 禁止重定向
 REDIRECT_ENABLED = False
 
 # 超时
-DOWNLOAD_TIMEOUT = 20
+DOWNLOAD_TIMEOUT = 10
 
 # 设置每分钟40个请求
 # RANDOMIZE_DOWNLOAD_DELAY = False
-# DOWNLOAD_DELAY = 3
-# CONCURRENT_REQUESTS_PER_IP=40
+DOWNLOAD_DELAY = 0.5
+# CONCURRENT_REQUESTS_PER_IP=60/20
 # CONCURRENT_REQUESTS_PER_DOMAIN = 1
-
+RETRY_TIMES = 5
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-# CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 1000
 
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
@@ -49,6 +49,7 @@ DOWNLOAD_TIMEOUT = 20
 
 # Disable cookies (enabled by default)
 COOKIES_ENABLED = False
+RETRY_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
 # TELNETCONSOLE_ENABLED = False
@@ -71,8 +72,15 @@ DOWNLOADER_MIDDLEWARES = {
    # 'jiedian.middlewares.MyCustomDownloaderMiddleware': 543,
    #  'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
 #     'jiedian.middlewares.RotateUserAgentMiddleware': 400,
-#     'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,#必需 ,禁用默认的middleware
-    # 'jiedian.middlewares.MyAgent': 400,
+    'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,#必需 ,禁用默认的middleware
+    'jiedian.middlewares.MyAgent': 400,
+
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': None,
+    # 'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 123,
+    'jiedian.middlewares.ProxyMiddleWare': 125,
+    'scrapy.downloadermiddlewares.defaultheaders.DefaultHeadersMiddleware': None,
+    #禁止重试
+    # 'scrapy.downloadmiddleware.retry.RetryMiddleware':None
 }
 
 # Enable or disable extensions
@@ -106,7 +114,7 @@ ITEM_PIPELINES = {
 # HTTPCACHE_EXPIRATION_SECS = 0
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
-LOG_FILE = 'zl.log'
+# LOG_FILE = 'zl.log'
 
 # Retry many times since proxies often fail
 # RETRY_TIMES = 1# Retry on most error codes since proxies fail for different reasons
