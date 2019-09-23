@@ -86,7 +86,6 @@ class ProxyMiddleWare(object):
         self.r = redis.StrictRedis(host='127.0.0.1', port=6379, decode_responses=True)
 
     def process_request(self, request, spider):
-        pass
         # proxy_dic = self.r.hgetall('raw_proxy')
         # proxy_dic_keys = proxy_dic.keys()
         # 30s请求一次
