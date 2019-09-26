@@ -4,7 +4,7 @@ from jiedian import settings
 
 
 class helpers():
-
+    #cceshi
     def mysql(self, sql):
         connection = pymysql.connect(
             host=settings.MYSQL_HOST,
